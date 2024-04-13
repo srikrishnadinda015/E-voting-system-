@@ -1,24 +1,5 @@
-
 import streamlit as st
-from flask import Flask, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
-
-# Initialize Flask app
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///voting.db'
-db = SQLAlchemy(app)
-
-# Define database models
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(100), nullable=False)
-    voted = db.Column(db.Boolean, default=False)
-
-class Party(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), unique=True, nullable=False)
-    votes = db.Column(db.Integer, default=0)
+import requests
 
 # Define Streamlit UI components
 def main():
@@ -42,7 +23,7 @@ def register_page():
     confirm_password = st.text_input("Confirm Password", type="password")
     if st.button("Register"):
         # Call backend API to register user
-        response = requests.post("http://localhost:5000/register", json={"username": username, "password": password})
+        response = requests.post("https://your-backend-api/register", json={"username": username, "password": password})
         if response.status_code == 201:
             st.success("User registered successfully")
         else:
@@ -55,7 +36,7 @@ def login_page():
     password = st.text_input("Password", type="password")
     if st.button("Login"):
         # Call backend API to authenticate user
-        response = requests.post("http://localhost:5000/login", json={"username": username, "password": password})
+        response = requests.post("https://your-backend-api/login", json={"username": username, "password": password})
         if response.status_code == 200:
             st.success("Login successful")
         else:
@@ -65,7 +46,7 @@ def login_page():
 def party_selection_page():
     st.title("Party Selection")
     # Display list of parties fetched from backend
-    parties = requests.get("http://localhost:5000/parties").json()
+    parties = requests.get("https://your-backend-api/parties").json()
     for party in parties:
         st.write(party['name'])
     # Allow user to select a party
@@ -80,4 +61,3 @@ def voting_page():
 
 if __name__ == "__main__":
     main()
-
